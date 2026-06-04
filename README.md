@@ -25,24 +25,13 @@ Control group: Leather Goods, Ceramic Products
 
 Methodology
 Main Model — TWFE DiD
-log(Exports_it + 1) = alpha_i + gamma_t + delta*(Treated_i x Post_t) + epsilon_it
-
-alpha_i — Sector fixed effects
-gamma_t — Year fixed effects
-delta — DiD coefficient (ATT): the causal effect of PLI on log exports
-Standard errors clustered at the sector level
-Estimated using feols() from the fixest package in R
-
 Event Study (Parallel Trends Test)
-log(Exports_it + 1) = alpha_i + gamma_t + SUM_{k != 2019} beta_k*(I[t=k] x Treated_i) + epsilon_it
 Reference year: 2019. Pre-treatment coefficients (2017, 2018) tested for significance to validate parallel trends.
 Placebo Test
 Fake treatment date assigned at 2018. A non-significant placebo coefficient confirms the DiD design is not capturing a spurious pre-existing trend.
 
 Key Results
 TestCoefficientStd. Errorp-valueInterpretationMain DiD (delta)0.88010.94590.4208~141% export increase; positive but not significantPlacebo (fake 2018)1.06840.98480.3573Not significant — design validated
-Event Study Coefficients
-Yearbeta_kp-valueNote2017-1.2760.287Pre-trend: not significant2018-1.3980.268Pre-trend: not significant2019(reference)—Base year2020-0.3230.078COVID-19 disruption2021-0.1850.518Recovery phase2022-0.0540.928Convergence2023+0.1400.848Gradual positive trend2024+0.3670.704Continued upward trend
 
 Pre-treatment coefficients are not statistically significant → parallel trends assumption supported
 Post-treatment pattern shows gradual build-up consistent with PLI's 5-year incremental incentive design
