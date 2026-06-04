@@ -1,126 +1,60 @@
-Project Overview
+Evaluating the Impact of the Production Linked Incentive (PLI) Scheme on India's Export Performance: A Difference-in-Differences Analysis
+Author: Shashi Kulkarni
+Institution: GIPE Pune — MSc Economics
+Date: June 2026
+Method: Difference-in-Differences (DiD)
 
-This project evaluates the impact of India’s Production Linked Incentive (PLI) Scheme on export performance using a Difference-in-Differences (DiD) framework.
-
-The study compares:
-
-Treatment Sectors (PLI-covered):
-Mobile Manufacturing
-Medical Devices
-
-with
-
-Control Sectors (Non-PLI):
-Leather Goods
-Ceramic Products
-
-over the period 2017–2024.
-
-The objective is to estimate whether the introduction of the PLI scheme in 2020 led to a measurable increase in exports in treated sectors relative to untreated sectors.
+Overview
+This project estimates the causal impact of India's Production Linked Incentive (PLI) scheme on sectoral export performance using a Two-Way Fixed Effects (TWFE) Difference-in-Differences design. The PLI scheme, launched in March 2020, provides financial incentives of 4–6% on incremental sales to manufacturers in strategically selected sectors.
+The analysis compares export trajectories of two PLI-covered sectors (Mobile Manufacturing and Medical Devices) against two non-PLI sectors (Leather Goods and Ceramic Products) over the period 2017–2024.
 
 Research Questions
-Did the PLI scheme significantly increase exports in treated sectors?
-Do the treatment and control groups satisfy the parallel trends assumption required for Difference-in-Differences analysis?
-Methodology
-Econometric Framework
 
-The project uses a Two-Way Fixed Effects (TWFE) Difference-in-Differences model.
-
-Model Specification
-log(Exports
-it
-	​
-
-+1)=α
-i
-	​
-
-+γ
-t
-	​
-
-+δ(Treated
-i
-	​
-
-×Post
-t
-	​
-
-)+ϵ
-it
-	​
+Did the PLI scheme generate a statistically significant increase in exports of treated sectors relative to control sectors?
+Do the pre-treatment export trends satisfy the parallel trends assumption underpinning the DiD framework?
 
 
-Where:
-
-α
-i
-	​
-
- = sector fixed effects
-γ
-t
-	​
-
- = year fixed effects
-Treated
-i
-	​
-
- = PLI-covered sectors
-Post
-t
-	​
-
- = post-2020 period
-δ = treatment effect (ATT)
-Diagnostic Tests
-
-The project includes multiple robustness checks:
-
-1. Event Study / Parallel Trends Test
-Tests whether treatment and control sectors followed similar trends before 2020.
-2. Placebo Test
-Assigns a fake treatment year (2018) to verify that the estimated effect is not driven by pre-existing trends.
 Data
-Source
-DGFT / Ministry of Commerce and Industry, Government of India
-Variables
-Variable	Description
-exports	Annual export value (USD Mn)
-treated	=1 for PLI sectors
-post	=1 for years ≥ 2020
-log_exports	log(exports + 1)
-Time Period
+VariableDescriptionSourceExportsAnnual export value (USD millions)DGFT / Ministry of Commerce, Indiatreated=1 for PLI-covered sectors (Mobile Mfg, Medical Devices)PLI Scheme Notificationpost=1 for year >= 2020—log_exportslog(Exports + 1) — dependent variableDerived in R
 
-2017–2024
+Panel structure: 4 sectors × 8 years (2017–2024) = 32 observations (balanced)
+Treatment cutoff: 2020
+Treatment group: Mobile Manufacturing, Medical Devices
+Control group: Leather Goods, Ceramic Products
 
-Observations
 
-32 panel observations
+Methodology
+Main Model — TWFE DiD
+log(Exports_it + 1) = alpha_i + gamma_t + delta*(Treated_i x Post_t) + epsilon_it
 
-Key Findings
-Main DiD Result
+alpha_i — Sector fixed effects
+gamma_t — Year fixed effects
+delta — DiD coefficient (ATT): the causal effect of PLI on log exports
+Standard errors clustered at the sector level
+Estimated using feols() from the fixest package in R
 
-Estimated treatment effect:
-
-δ=0.88
-
-Approximate interpretation:
-
-PLI-associated export increase ≈ 141%
-Computed as:
-e
-0.88
-−1
-Statistical Significance
-p-value = 0.42
-Result is not statistically significant at conventional levels due to the small sample size.
-Event Study Findings
-No significant pre-treatment divergence.
-Supports the parallel trends assumption.
-Post-2020 effects gradually become more positive over time.
+Event Study (Parallel Trends Test)
+log(Exports_it + 1) = alpha_i + gamma_t + SUM_{k != 2019} beta_k*(I[t=k] x Treated_i) + epsilon_it
+Reference year: 2019. Pre-treatment coefficients (2017, 2018) tested for significance to validate parallel trends.
 Placebo Test
-Fake treatment year produces insignificant results.
-Supports validity of the DiD design.
+Fake treatment date assigned at 2018. A non-significant placebo coefficient confirms the DiD design is not capturing a spurious pre-existing trend.
+
+Key Results
+TestCoefficientStd. Errorp-valueInterpretationMain DiD (delta)0.88010.94590.4208~141% export increase; positive but not significantPlacebo (fake 2018)1.06840.98480.3573Not significant — design validated
+Event Study Coefficients
+Yearbeta_kp-valueNote2017-1.2760.287Pre-trend: not significant2018-1.3980.268Pre-trend: not significant2019(reference)—Base year2020-0.3230.078COVID-19 disruption2021-0.1850.518Recovery phase2022-0.0540.928Convergence2023+0.1400.848Gradual positive trend2024+0.3670.704Continued upward trend
+
+Pre-treatment coefficients are not statistically significant → parallel trends assumption supported
+Post-treatment pattern shows gradual build-up consistent with PLI's 5-year incremental incentive design
+Overall model fit: Adjusted R² = 0.95, Within R² = 0.16
+
+R Dependencies
+rinstall.packages(c("readxl", "fixest", "dplyr", "ggplot2"))
+PackagePurposereadxlLoad Excel datasetfixestTWFE DiD via feols(), event study via iplot()dplyrData wranglingggplot2Visualisation
+
+Limitations
+
+Small sample (32 observations, 4 sector clusters) limits statistical power and makes clustered SE inference unreliable
+Control sectors differ substantially from treatment sectors in absolute export scale
+Post-2020 period confounded by COVID-19, China+1 supply chain restructuring, and other concurrent policies
+TWFE may mask heterogeneous treatment effects across sectors (see Callaway & Sant'Anna, 2021)
